@@ -37,8 +37,30 @@ const findUserByName = (name) => {
       (user) => user["name"] === name
     );
 };
+
+const findUserByNameAndJob = (name, job) => {
+    return users["users_list"].filter(
+      (user) => user["name"] === name && user["job"] === job
+    );
+};
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
+
+const addUser = (user) => {
+  const id = Math.random().toString(36).substr(2, 9);
+  const newUser = { ...user, id };
+  users["users_list"].push(newUser);
+  return newUser;
+};
+
+const deleteUser = (id) => {
+  const userIndex = users["users_list"].findIndex((user) => user["id"] === id);
+  if (userIndex !== -1) {
+    const deletedUser = users["users_list"].splice(userIndex, 1)[0];
+    return deletedUser;
+  }
+  return undefined;
+};
 
 app.use(express.json());
   
@@ -48,11 +70,18 @@ app.get("/", (req, res) => {
 
 app.get("/users", (req, res) => {
     const name = req.query.name;
-    if (name != undefined) {
+    const job = req.query.job;
+    if (name != undefined && job != undefined) {
+      let result = findUserByNameAndJob(name, job);
+      result = { users_list: result };
+      res.send(result);
+    }
+    else if (name != undefined) {
       let result = findUserByName(name);
       result = { users_list: result };
       res.send(result);
-    } else {
+    }
+    else {
       res.send(users);
     }
 });
@@ -65,6 +94,37 @@ app.get("/users/:id", (req, res) => {
   } else {
     res.send(result);
   }
+});
+
+app.post("/users", (req, res) => {
+    const userToAdd = req.body;
+    if (!userToAdd) {
+        return res.status(400).json({ 
+            error: "Request body is required" 
+        });
+    }
+    if (!userToAdd.name || !userToAdd.job) {
+        return res.status(400).json({ 
+            error: "Name and job are required fields" 
+        });
+    }
+    
+    const newUser = addUser(userToAdd);
+    res.status(201).json(newUser);
+});
+
+app.delete("/users/:id", (req, res) => {
+    const id = req.params.id;
+    const deletedUser = deleteUser(id);
+    
+    if (deletedUser === undefined) {
+        res.status(404).json({ error: "User not found" });
+    } else {
+        res.status(200).json({ 
+            message: "User deleted successfully", 
+            deletedUser: deletedUser 
+        });
+    }
 });
 
 app.listen(port, () => {
