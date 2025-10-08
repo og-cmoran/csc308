@@ -122,10 +122,7 @@ app.delete("/users/:id", (req, res) => {
     if (deletedUser === undefined) {
         res.status(404).json({ error: "User not found" });
     } else {
-        res.status(200).json({ 
-            message: "User deleted successfully", 
-            deletedUser: deletedUser 
-        });
+        res.status(204).send();
     }
 });
 

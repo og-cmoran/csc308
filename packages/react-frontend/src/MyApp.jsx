@@ -6,10 +6,29 @@ function MyApp() {
   const [characters, setCharacters] = useState([]);
 
   function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+    const characterToDelete = characters[index];
+    const id = characterToDelete.id;
+    
+    // Make HTTP DELETE request to backend
+    fetch(`http://localhost:8000/users/${id}`, {
+      method: 'DELETE'
+    })
+    .then((response) => {
+      if (response.status === 204) {
+        // Successfully deleted on backend, now update frontend
+        const updated = characters.filter((character, i) => {
+          return i !== index;
+        });
+        setCharacters(updated);
+      } else if (response.status === 404) {
+        throw new Error('User not found on server');
+      } else {
+        throw new Error(`Unexpected status code: ${response.status}`);
+      }
+    })
+    .catch((error) => {
+      console.log('Failed to delete user:', error);
     });
-    setCharacters(updated);
   }
 
   function updateList(person) { 
