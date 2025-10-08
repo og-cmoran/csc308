@@ -6,6 +6,14 @@ function Form(props) {
     job: ""
   });
 
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setPerson(prevPerson => ({
+      ...prevPerson,
+      [name]: value
+    }));
+  }
+
   function submitForm() {
     props.handleSubmit(person);
     setPerson({ name: "", job: "" });
@@ -33,12 +41,5 @@ function Form(props) {
     </form>
   );
 }
-
-function handleChange(event) {
-    const { name, value } = event.target;
-    if (name === "job")
-      setPerson({ name: person["name"], job: value });
-    else setPerson({ name: value, job: person["job"] });
-  }
 
 export default Form;
