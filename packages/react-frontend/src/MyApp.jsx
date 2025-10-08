@@ -9,13 +9,11 @@ function MyApp() {
     const characterToDelete = characters[index];
     const id = characterToDelete.id;
     
-    // Make HTTP DELETE request to backend
     fetch(`http://localhost:8000/users/${id}`, {
       method: 'DELETE'
     })
     .then((response) => {
       if (response.status === 204) {
-        // Successfully deleted on backend, now update frontend
         const updated = characters.filter((character, i) => {
           return i !== index;
         });
